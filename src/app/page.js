@@ -1,4 +1,5 @@
 "use client";
+//console用於確認階段是否成功
 import { useRef, useEffect, useState } from "react";
 import * as Tone from "tone";
 import * as handpose from "@tensorflow-models/handpose";
@@ -50,7 +51,7 @@ export default function Home() {
     if (!toneStartedRef.current) {
       Tone.start().then(() => {
         toneStartedRef.current = true;
-        console.log("🔓 Tone.js 啟動");
+        console.log("Tone.js 啟動");
       });
       return;
     }
@@ -67,16 +68,14 @@ export default function Home() {
       const dy = y - lastPointRef.current.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
     
-      // 使用對數或根號縮放，避免距離一大就爆炸
-      velocity = Math.log(distance + 1); // 加1避免 log(0)
+      velocity = Math.log(distance + 1); //使用根號縮放，避免距離一大就爆炸，加1避免 log(0)出現
     }
     lastPointRef.current = { x, y };
     
-    // 調整 radius 計算方式讓變化更明顯
     const baseRadius = 4;
-    const scaledVelocity = Math.pow(velocity, 1.2);  // 讓變化非線性、但敏感一點
-    const dynamicRadius = baseRadius + scaledVelocity * 2; // 2 是倍數可以再微調
-    const clampedRadius = Math.min(dynamicRadius, 40);  // 提高最大半徑
+    const scaledVelocity = Math.pow(velocity, 1.2);  // 讓變化可以更敏感一點
+    const dynamicRadius = baseRadius + scaledVelocity * 2;     
+    const clampedRadius = Math.min(dynamicRadius, 40);  
 
     
     dotsRef.current.push({
@@ -87,7 +86,7 @@ export default function Home() {
       createdAt: now
     });
 
-    console.log("🎵 播放", note, x < width / 2 ? "Synth" : "MonoSynth");
+    console.log("播放", note, x < width / 2 ? "Synth" : "MonoSynth");
   };
 
   useEffect(() => {
@@ -136,7 +135,7 @@ export default function Home() {
 
     const runHandpose = async () => {
       model = await handpose.load();
-      console.log("✋ Handpose 模型已載入");
+      console.log("Handpose 模型已載入");
 
       const detect = async () => {
         if (videoRef.current && model) {
@@ -263,7 +262,7 @@ export default function Home() {
       )}
 
       <footer className="mt-6 text-cyan-700 text-center text-sm font-serif">
-        手勢控制音樂與顏色 🎶 揮動食指來演奏！
+        用手控制音樂與顏色 🎶 揮動來演奏！
       </footer>
     </main>
   );
